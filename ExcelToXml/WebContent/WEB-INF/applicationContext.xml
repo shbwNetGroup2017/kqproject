@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+    
+    <!--编程式事务管理  -->
+    <bean id="txManager"
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+    <tx:annotation-driven transaction-manager="txManager" />
+     
+     
+     <!-- action的配置 -->
+	<bean id="toXmlPage" class="com.cyl.bwjf.exceltoxml.ExcToXmlAction" scope="prototype"></bean>
+	<bean id="index" class="com.cyl.bwjf.exceltoxml.MainPage" scope="prototype"></bean>
+	<bean id="zhuce" class="com.cyl.bwjf.exceltoxml.RegistAction" scope="prototype">
+	    <property name="registServiceImpl" ref="registServiceImpl" />
+	</bean>
+	<bean id="index_chat" class="com.cyl.bwjf.exceltoxml.ChatAction" scope="prototype"></bean>
+	<bean id="exceltoxml" class="com.cyl.bwjf.exceltoxml.ExcToXmlAction" scope="prototype">
+	     <property name="kpjkExcelServiceImpl" ref="kpjkExcelServiceImpl" />
+	</bean>
+	<bean id="scXml" class="com.cyl.bwjf.exceltoxml.ExcToXmlAction" scope="prototype">
+	     <property name="kpjkExcelServiceImpl" ref="kpjkExcelServiceImpl" />
+	</bean>
+	<bean id="zyDl" class="com.cyl.bwjf.exceltoxml.XmlDownLoad" scope="prototype">
+	</bean>
+   
+    <!-- Service注入 -->
+	<bean id="kpjkExcelServiceImpl" class="net.bwjf.kpjk.bo.KpjkExcelServiceImpl">
+		<property name="iDaoExcelToXml" ref="iDaoExcelToXml" />
+	</bean>
+	<bean id="registServiceImpl" class="net.bwjf.kpjk.bo.RegistServiceImpl">
+		<property name="iDaoRegistImpl" ref="iDaoRegistImpl" />
+	</bean>
+	
+	<!--Dao注入  -->
+   	<bean id="iDaoExcelToXml" class="net.bwjf.kpjk.dao.DaoExcelToXmlImpl">
+   		<property name="sqlMapClient"><ref bean="sqlMapClient" /></property>
+   	</bean>
+   
+    <bean id="iDaoRegistImpl" class="net.bwjf.kpjk.dao.DaoRegistImpl">
+   		<property name="sqlMapClient"><ref bean="sqlMapClient" /></property>
+   	</bean>
+   
+   <!-- 配置数据库连接源 -->
+   <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource" destroy-method="close">
+       <property value="oracle.jdbc.driver.OracleDriver" name="driverClassName"/>
+       <property value="jdbc:oracle:thin:@192.168.1.131:1521:orcl" name="url"/>
+       <property value="kpjk" name="username"/>
+       <property value="kpjk" name="password"/>
+       <property value="10" name="maxActive"/>
+       <property value="1000" name="maxWait"/>
+       <property value="30" name="maxIdle"/>
+       <property value="true" name="removeAbandoned"/>
+       <property value="60" name="removeAbandonedTimeout"/>
+       <property value="true" name="logAbandoned"/>
+   </bean>
+    
+    <bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+         <property name="configLocation" value="/WEB-INF/sql-map-config.xml" />
+         <property name="dataSource" ref="dataSource" />
+    </bean>
+</beans>

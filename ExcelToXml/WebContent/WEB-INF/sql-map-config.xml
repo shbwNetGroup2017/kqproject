@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<!-- useStatementNamespaces="true" 指定了在SQLMAP映射文件中是否用全限定名来引用映射声明 -->
+	<settings cacheModelsEnabled="true" enhancementEnabled="true"
+		lazyLoadingEnabled="true" maxRequests="15" maxSessions="10"
+		maxTransactions="5" useStatementNamespaces="true" />
+			
+    <!--数据库的操作文件  -->
+	<sqlMap resource="net/bwjf/kpjk/domain/entities/excel.xml" />
+	<sqlMap resource="net/bwjf/kpjk/domain/entities/user.xml" />
+</sqlMapConfig>

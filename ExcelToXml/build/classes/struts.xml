@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	
+	<constant name="struts.action.extension" value="action" />
+	<constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+    <constant name="struts.devMode" value="false"/>
+    <constant name="struts.objectFactory" value="spring" />
+    <constant name="struts.custom.i18n.resources" value="ApplicationResources" />
+    <constant name="struts.multipart.maxSize" value="104857600" />
+    <constant name="struts.action.excludePattern" value="/test"></constant> 
+    
+
+	<package name="xml" namespace="/xml" extends="json-default">
+ 	     <interceptors>  
+            <interceptor name="loginInteceptor" class="net.bwjf.kpjk.interceptor.LoginInterceptor" />  
+            <interceptor-stack name="loginStack">  
+                   <interceptor-ref name="defaultStack"></interceptor-ref>  
+<!--                    <interceptor-ref name="loginInteceptor">  
+                       <param name="excludeMethods">login</param>  
+                   </interceptor-ref>     -->    
+            </interceptor-stack>  
+        </interceptors> 
+ 
+	    <global-results> 
+           <result name="login">/login.jsp</result> 
+        </global-results> 
+	    <!--进入到xml转换文件页面  -->
+		<action name="toXmlPage" class="toXmlPage" method="execute">
+		<interceptor-ref name="loginInteceptor"></interceptor-ref> 
+			<result name="success">/excelToXml.jsp</result>
+		</action>
+		
+		<action name="FPDetails" class="scXml" method="getFPDetails">
+			<result name="success">/FPDetails.jsp</result>
+		</action>
+		
+		<action name="fpHz" class="scXml" method="fpHz">
+			<result name="success">/excelToXml.jsp</result>
+		</action>
+		
+		<!--上传Excel数据 -->
+		<action name="exceltoxml" class="exceltoxml" method="upfile">
+		<interceptor-ref name="loginInteceptor"></interceptor-ref> 
+			<result name="success">/excelToXml.jsp</result>
+			 <result name="input">/excelToXml.jsp</result> 
+			<interceptor-ref name="fileUpload">
+                 <param name="maximumSize">104857600</param>
+                 <param name="allowedTypes">
+                     application/octet-stream,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                 </param>    
+            </interceptor-ref>
+             <interceptor-ref name="defaultStack" /> 
+		</action>
+		
+	   <!--返回stream数据  -->
+	   <action name="xmlDl" class="scXml">
+	    <interceptor-ref name="loginInteceptor"></interceptor-ref>
+		   <result name="success" type="stream"> 
+			    <param name="contentType">application/xml</param>
+			    <param name="inputName">xmlDl</param>
+			    <param name="contentDisposition">attachment;fileName=${fileName}</param>
+			    <param name="bufferSize">1024</param>
+		   </result>
+	   </action> 
+	   
+	   <!--测试数据  返回stream数据  -->
+	   <action name="zyDl" class="zyDl">
+		   <result name="success" type="stream">
+			    <param name="contentType">application/vnd.ms-excel,application/msword</param>
+			    <param name="inputName">zyDl</param>
+			    <param name="contentDisposition">attachment;fileName=${fileName}</param>
+			    <param name="bufferSize">1024</param>
+		   </result>
+	   </action> 
+	   
+	   <!--index界面  -->
+	   <action name="index" class="index" method="execute">
+	   <interceptor-ref name="loginInteceptor"></interceptor-ref> 
+		   <result name="success">
+                /index.jsp
+		   </result>
+	   </action> 
+	   
+	   <!-- 用户注册 -->
+	   <action name="zhuce" class="zhuce" method="zhuce">
+			<result name="success">/login.jsp</result>
+			<result name="error">/zhuce.jsp</result>
+		</action>
+		
+		<!-- 用户注册页面 -->
+	    <action name="goResPage" class="zhuce" method="goResPage">
+			<result name="success">/zhuce.jsp</result>
+		 </action>
+		
+	   <!-- 用户登录 -->
+	   <action name="login" class="zhuce" method="login">
+			<result name="success">/index.jsp</result>
+			<result name="error">/login.jsp </result>
+	   </action>
+	   
+	   <!-- 用户注册页面 -->
+	   <action name="goLoginPage" class="zhuce" method="goLoginPage">
+			<result name="success">/login.jsp</result>
+	   </action>
+	   
+	   <!--返回json数据  -->
+	   <action name="jsonAction" class="zhuce" method="jsonMethod">
+            <result type="json" name="success">
+            </result>
+        </action>
+        
+        <!--用户账户退出  -->
+	    <action name="exit" class="zhuce" method="exit">
+            <result name="success">/login.jsp</result>
+        </action>
+        
+         <!--在线客服  -->
+	    <action name="index_chat" class="index_chat" method="index_chat">
+            <result name="success">/index_chat.jsp</result>
+        </action>
+	</package>
+</struts>

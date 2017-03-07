@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="user">
+	<typeAlias alias="String" type="java.lang.String" />
+	<typeAlias alias="Map" type="java.util.Map" />
+	<typeAlias alias="us" type="net.bwjf.kpjk.domain.entities.User" />
+	
+	<resultMap id="xmlMap" class="java.util.HashMap">
+		<result property="XMLSTR" column="XMLSTR" />
+	</resultMap>
+	
+	<select id="selectUser" resultClass="us"	parameterClass="us">
+		 select USER_DM as USERNAME, USER_PWD as PASSWORD from xt_user where USER_DM=#USERNAME# and USER_PWD=#PASSWORD#
+	</select>
+	<select id="judgeUser" resultClass="us"	parameterClass="String">
+		 select USER_DM as USERNAME, USER_PWD as PASSWORD from xt_user where USER_DM=#value#
+	</select>
+
+<!--调用有返回值的存储过程-->
+
+<parameterMap class="java.util.Map" id="yhzcProc">
+   <parameter mode="IN" jdbcType="VARCHAR" javaType="string" property="p_user_dm"/>
+   <parameter mode="IN" jdbcType="VARCHAR" javaType="string" property="p_user_pwd"/>
+   <parameter mode="IN" jdbcType="VARCHAR" javaType="string" property="p_gsmc"/> 
+   <parameter mode="IN" jdbcType="VARCHAR" javaType="string" property="p_nsrsbh"/>
+   <parameter mode="IN" jdbcType="VARCHAR" javaType="string" property="p_jydz"/>
+   <parameter mode="IN" jdbcType="VARCHAR" javaType="string" property="p_lxr"/>
+   <parameter mode="IN" jdbcType="VARCHAR" javaType="string" property="p_lxfs"/>
+   <parameter mode="OUT" jdbcType="VARCHAR" javaType="string" property="rtnVal"/>
+</parameterMap>
+<!--有返回值 的存储过程-->
+<procedure id="yhzcProc" parameterMap="yhzcProc"> { call PKG_KPJK_XTGL.P_XT_ZC(?,?,?,?,?,?,?,?) } </procedure>
+
+</sqlMap>

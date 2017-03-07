@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="KpjkExcel">
+	<typeAlias alias="String" type="java.lang.String" />
+	<typeAlias alias="Map" type="java.util.Map" />
+	<typeAlias alias="kpjkExcel" type="net.bwjf.kpjk.domain.entities.KpjkExcel" />
+	
+	<resultMap id="xmlMap" class="java.util.HashMap">
+		<result property="XMLSTR" column="XMLSTR" />
+	</resultMap>
+	
+    <insert id="saveExcel" parameterClass="net.bwjf.kpjk.domain.entities.KpjkExcel">
+		insert into KpjkExcel(EXCELFILEBS,DJH, GFMC, GFSBH, GFDZDH,GFYHZH,BZ,FHR,SKR,HWMC,JLDW,GG,SPSL,JE,SL,DJ,USER_DM)
+		  values(#EXCELFILEBS#,#DJH#, #GFMC#, #GFSBH#, #GFDZDH#,#GFYHZH#,#BZ#,#FHR#,#SKR#,#HWMC#,#JLDW#,#GG#,#SPSL#,#JE#,#SL#,#DJ#,#user_dm#)
+	</insert>
+
+    <select id="selectByExcelID" resultClass="kpjkExcel"	parameterClass="kpjkExcel">
+		 select * from KPJKEXCEL where EXCELFILEBS=#EXCELFILEBS# order by DJH
+	</select>
+	 <select id="selectFPDetails" resultClass="kpjkExcel"	parameterClass="kpjkExcel">
+		  select t.*,ltrim(TO_CHAR((to_number(replace(JE,',' ))/(1+to_number(SL))),'999999999.99')) as JE_BHS_FPMX,
+     ltrim(TO_CHAR((to_number(replace(DJ,',' ))/(1+to_number(SL))),'999999990.999999')) as DJ_BHS,
+         ltrim(TO_CHAR(((to_number(replace(JE,',' ))/(1+to_number(SL)))*to_number(SL)),'999999999.99'))  as SE
+           from KPJKEXCEL t
+           where EXCELFILEBS=#EXCELFILEBS# and DJH=#DJH# 
+	</select>
+	
+	<select id="selectByExcelID_HZ" resultClass="kpjkExcel"	parameterClass="kpjkExcel">
+      select  excelfilebs,djh,mxts,zje,se,
+         je_bhs,
+         gfxx as BZ from (
+        select excelfilebs,djh,
+        count(1) as mxts ,sum(je) as zje,
+        sum(ltrim(TO_CHAR((to_number(replace(JE,',' ))/(1+to_number(SL))),'999999999.99'))) as je_bhs,
+        sum(ltrim(TO_CHAR(((to_number(replace(JE,',' ))/(1+to_number(SL)))*to_number(SL)),'999999999.99')))  as SE,
+         pkg_kpjkexcel_xml.F_GET_GFXX_DJH(excelfilebs,djh) as gfxx
+         from kpjkexcel t 
+        where excelfilebs=#EXCELFILEBS#
+        group by excelfilebs,djh
+        order by djh
+         )
+	</select>
+	
+ <select id="getXml" resultMap="xmlMap"	parameterClass="kpjkExcel">
+		 select XMLSTR from excel_xmlpck where XMLPCKID=#EXCELFILEBS#
+	</select>
+     <select id="selectSEQ_KPJKEXCEL" resultClass="java.lang.String">
+		 select SEQ_KPJKEXCEL.NEXTVAL as WJBS from dual
+	</select>
+<!--调用有返回值的存储过程-->
+<parameterMap class="java.util.Map" id="scxmlProc">
+   <parameter mode="IN" jdbcType="VARCHAR" javaType="string" property="p_excelfilebs"/>
+   <parameter mode="OUT" jdbcType="VARCHAR" javaType="string" property="p_cgbz"/>
+</parameterMap>
+<!--有返回值 的存储过程-->
+<procedure id="scxmlProc" parameterMap="scxmlProc"> { call PKG_KPJKEXCEL_XML.P_SC_XML(?,?) } </procedure>
+</sqlMap>
