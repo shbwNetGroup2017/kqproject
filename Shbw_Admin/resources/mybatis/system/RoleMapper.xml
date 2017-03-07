@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RoleMapper">
+	
+	<select id="selectlistPage" parameterType="page" resultType="pd">
+		select 
+			j.id,
+			j.jsmc,
+			j.jsms,
+			j.zt,
+			j.creator,
+			j.create_date,
+			j.updator,
+			j.update_date,
+			j.del_flag,
+			j.remark
+		from t_jsgl j
+			where 1=1 and j.del_flag='0'
+			<if test="pd.jsmc != null and pd.jsmc != ''">
+				and j.jsmc like concat('%',#{pd.jsmc},'%')
+			</if>
+			ORDER BY j.create_date desc
+	</select>
+	
+	<select id="selectlistMenu" parameterType="pd" resultType="pd">
+		SELECT
+			t.id,
+			t.zymc,			
+			t.zyxh
+		FROM
+			t_zygl t
+			where t.del_flag='0' and t.zt='0' and LENGTH(t.zyxh)>2
+			ORDER BY t.zyxh asc
+	</select>
+	
+	<select id="selectlistGxMenu" parameterType="pd" resultType="pd">
+		SELECT
+			l.id,
+			l.zymc,
+			(
+				SELECT
+					j.zyid
+				FROM
+					t_js_zy j
+				WHERE
+					j.zyid = l.id and j.del_flag='0'
+				AND j.jsid = #{id}
+			) AS p,
+			(
+				SELECT
+					k.jsid
+				FROM
+					t_js_zy k
+				WHERE
+					k.zyid = l.id and  k.del_flag='0'
+				AND k.jsid = #{id}
+			) AS z
+		FROM
+			t_zygl l
+		where l.del_flag='0' and l.zt='0' and LENGTH(l.zyxh)>2
+			ORDER BY l.zyxh asc
+	</select>
+	
+	<insert id="insertRole" parameterType="pd" useGeneratedKeys="true" keyProperty="id">
+		insert into t_jsgl(
+			  jsmc,
+			  jsms,
+			  zt,
+			  creator,
+			  create_date,
+			  remark
+		) values (
+			#{jsmc},
+			#{jsms},
+			#{zt},
+			#{creator},
+			SYSDATE(),
+			#{remark}
+		)
+	</insert>
+	
+	<insert id="insertResourceGx" parameterType="pd">
+		insert into t_js_zy(
+			jsid,
+			zyid,
+			creator, 
+			create_date
+		) values (
+			#{jsid},
+			#{zyid},			
+			#{creator},
+			SYSDATE()
+		)
+	</insert>
+	
+	<select id="selectobjRole" parameterType="pd" resultType="pd">
+		SELECT
+			j.id,
+			j.jsmc,
+			j.jsms,
+			j.zt,
+			j.creator,
+			j.create_date,
+			j.updator,
+			j.update_date
+		FROM
+			t_jsgl j
+			where 1=1 and  j.del_flag='0'
+			<if test="id != null and id != ''">
+				and j.id = #{id}		
+			</if>
+	</select>
+	
+	<update id="updateRole" parameterType="pd">
+			update t_jsgl set 	
+				jsmc = #{jsmc}
+				, jsms = #{jsms}
+				, zt = #{zt}
+				, updator=#{updator}
+				,update_date=SYSDATE()
+		WHERE  id = #{id}
+	</update>
+	
+	<update id="deleteResourceGx" parameterType="pd">
+			update t_js_zy set del_flag='1' where jsid=#{jsid}
+	</update>
+	
+	<insert id="updateResourceGx" parameterType="pd">
+		insert into t_js_zy(
+			jsid,
+			zyid,
+			creator, 
+			create_date,
+			updator,
+			update_date
+		) values (
+			#{jsid},
+			#{zyid},			
+			#{creator},
+			SYSDATE(),
+			#{updator},
+			SYSDATE()
+		)
+	</insert>
+	
+	<update id="deleteRole" parameterType="pd">
+		update t_jsgl set del_flag='1' where id=#{id}
+	</update>
+	
+</mapper>

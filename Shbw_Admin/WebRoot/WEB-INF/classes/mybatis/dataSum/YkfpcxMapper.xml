@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ykfpcxMapper">
+
+	 <!-- 查询订单列表 -->
+	<select id="selectYkfpcxlistPage" parameterType="page" resultType="pd">
+	SELECT
+	tk.kplsh,
+	tk.fplx,
+	tk.xfmc,
+	tk.jshj,
+	tk.hjse,
+	tk.hjje,
+	tk.gfmc,
+	tg.gfmc as khmc
+FROM
+	t_kpls tk,
+	t_gfxx tg
+WHERE
+	tg.id = tk.ygsid
+	</select>
+</mapper>

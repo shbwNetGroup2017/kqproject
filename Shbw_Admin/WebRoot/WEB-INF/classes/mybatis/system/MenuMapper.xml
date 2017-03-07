@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MenuMapper">
+	<resultMap type="Menu" id="menuResultMap">
+		<id column="id" property="id"/>
+		<result column="zymc" property="zymc"/>
+		<result column="zylj" property="zylj"/>
+		<result column="zyxh" property="zyxh"/>
+	</resultMap>
+	
+	<sql id="menuResourceColumns">
+	   id,zymc,zylj,zyxh,zyms,zt,creator,create_date,updator,update_date,del_flag,remark
+	</sql>
+	
+	<!-- 查询一级资源目录 -->
+	<select id="listAllParentMenu" resultMap="menuResultMap">
+		select 
+		    <include refid="menuResourceColumns"/>
+		from t_zygl where zyxh like '__' and zt=0 and del_flag='0' order by zyxh
+	</select>
+
+    <!-- 查询授权后的菜单 -->
+	<select id="listSubMenuByParentId" parameterType="pd"
+		resultMap="menuResultMap">
+		select 
+		   <include refid="menuResourceColumns"/>
+		from t_zygl where 
+		   zyxh like CONCAT(#{zyxh},'%') 
+		   and zyxh like '____' 
+		   and zt=0 
+		   and del_flag='0'
+		   and id in (${zyid})
+		order by zyxh
+	</select>
+    
+    <!-- 查询授权后的菜单资源ID -->
+    <select id="listAllZyid" parameterType="String" resultType="pd">
+         select group_concat(zyid) as zyid from t_js_zy b 
+             where b.jsid in (
+                select jsid from t_yh_js a where a.yhid=(
+                   select id from t_yhgl where yhzh='${value}'
+                )
+             ) 
+    </select>
+</mapper>

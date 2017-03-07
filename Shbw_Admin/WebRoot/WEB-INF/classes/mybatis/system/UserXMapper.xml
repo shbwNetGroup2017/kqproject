@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserXMapper">
+
+	<sql id="userColumns">
+	   id,yhzh,yhmc,yhmm,xb,sjhm,zt,creator,create_date,updator,update_date,del_flag,remark
+	</sql>
+	<sql id="roleColumns">
+	   id,jsmc,jsms,zt,creator,create_date,updator,update_date,del_flag,remark
+	</sql>
+	<sql id="userGroupColumns">
+	   id,yhzmc,yhzms,zzjgid,creator,create_date,updator,update_date,del_flag,remark
+	</sql>
+	
+	<!-- 判断用户名和密码 -->
+	<select id="getUserInfo" parameterType="pd" resultType="pd">
+		select 
+		  <include refid="userColumns"/>
+		from t_yhgl where del_flag='0'
+		<if test="USERNAME != null and PASSWORD != null">
+			and yhzh = #{USERNAME} and yhmm = #{PASSWORD}
+		</if>
+	</select>
+
+	<!-- 用户列表(全部) -->
+	<select id="userlistPage" parameterType="page" resultType="pd">
+		select 
+		  <include refid="userColumns"/>
+		from t_yhgl u where del_flag='0'
+		<if test="pd.yhmc != null and pd.yhmc != ''">
+		    and yhmc like concat('%',#{pd.yhmc},'%')
+		</if>
+		<if test="pd.yhzh != null and pd.yhzh != ''">
+		    and yhzh like concat('%',#{pd.yhzh},'%')
+		</if>
+		 order by create_date desc
+	</select>
+
+	<!-- 获取用户信息 -->
+	<select id="findUserByAccount" parameterType="pd" resultType="pd">
+		select 
+		   <include refid="userColumns"/>
+		from t_yhgl where del_flag='0'
+		<if test="yhzh != null and yhzh != '' ">
+			and yhzh = #{yhzh}
+		</if>
+		<if test="id != null and id != '' ">
+			and id = #{id}
+		</if>
+	</select>
+
+	<!-- 查询用户角色 -->
+	<select id="findAllRole" resultType="pd">
+		select <include refid="roleColumns"/> from t_jsgl where del_flag='0'
+	</select>
+
+	<!-- 查询用户组 -->
+	<select id="finAllUserGroup" resultType="pd">
+		select <include refid="userGroupColumns"/> from t_yhz where del_flag='0'
+	</select>
+	
+	<!-- 查询修改用户时的角色 -->
+	<select id="findEditAllRole" resultType="pd">
+		SELECT l.id,l.jsmc,
+		    (
+			   SELECT
+				  'selected'
+			   FROM
+				  t_yh_js j
+			   WHERE
+				  l.id = j.jsid
+	           and j.yhid=#{id}
+	       	) AS p
+       FROM
+	     t_jsgl l 
+	   WHERE 
+	     del_flag='0'
+	</select>
+
+	<!-- 查询修改用户时的用户组 -->
+	<select id="finEditAllUserGroup" resultType="pd">
+		SELECT l.id,l.yhzmc,
+		    (
+			   SELECT
+				  'selected'
+			   FROM
+				  t_yhzyh j
+			   WHERE
+				  l.id = j.yhzid
+	       and j.yhid=#{id}
+		   ) AS p
+       FROM
+	       t_yhz l
+	   WHERE 
+	       del_flag='0'
+	</select>
+
+	<!-- 添加关系表用户角色 -->
+	<insert id="insertUserToRole" parameterType="pd">
+		insert into t_yh_js(yhid,jsid,creator,create_date,del_flag)values
+		<foreach collection="roleList" item="roleId" index="index"
+			separator=",">
+			(
+			#{id},
+			#{roleId},
+			#{operator},
+			SYSDATE(),
+			'0'
+			)
+		</foreach>
+	</insert>
+
+	<!-- 添加关系表用户组 -->
+	<insert id="insertUserToUserGroup" parameterType="pd">
+		insert into t_yhzyh(yhzid,yhid,creator,create_date,del_flag)values
+		<foreach collection="roleList" item="userGroupId" index="index"
+			separator=",">
+			(
+			#{userGroupId},
+			#{id},
+			#{operator},
+			SYSDATE(),
+			'0'
+			)
+		</foreach>
+	</insert>
+
+	<!-- 删除用户对应的角色信息 -->
+	<delete id="deleteUserToRole" parameterType="pd">
+		delete from t_yh_js where yhid=#{id}
+	</delete>
+
+	<!-- 删除用户对应的用户组信息 -->
+	<delete id="deleteUserToUserGroup" parameterType="pd">
+		delete from t_yhzyh where yhid=#{id}
+	</delete>
+
+	<!-- 添加用户信息 -->
+	<insert id="insertUser" useGeneratedKeys="true" keyProperty="id" parameterType="pd">
+		insert into
+		t_yhgl(id,yhzh,yhmc,yhmm,xb,sjhm,zt,creator,create_date,remark)
+		value(
+		#{yhid},
+		#{yhzh},
+		#{yhmc},
+		#{yhmm},
+		#{xb},
+		#{sjhm},
+		#{zt},
+		#{operator},
+		SYSDATE(),
+		#{remark}
+		)
+	</insert>
+
+	<!-- 更新用户信息 -->
+	<update id="updateUser" parameterType="pd">
+		update t_yhgl set
+		yhzh=#{yhzh},
+		yhmc=#{yhmc},
+		<if test="yhmm !=null and yhmm !='' ">
+			yhmm=#{yhmm},
+		</if>
+		<if test="xb !=null and xb !='' ">
+			xb=#{xb},
+		</if>
+		sjhm=#{sjhm},
+		zt=#{zt},
+		updator=#{operator},
+		update_date=SYSDATE(),
+		remark=#{remark}
+		where id=#{id}
+	</update>
+
+	<!-- 批量删除用户 -->
+	<update id="deleteUser" parameterType="String">
+		update t_yhgl set del_flag='1'
+		where id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="GroupManagerMapper">
+	<select id="zzjgslistPage" parameterType="page" resultType="pd">
+		SELECT id, xfsh, xfmc, xfyh, xfyhzh, xfdz, xfdh, jgbm, sjjgbm, xf_yxtid, creator, create_date, updator, update_date, del_flag, remark,zt FROM t_xfxx t
+		<where>
+			del_flag=0
+		</where>
+		<if test="pd.xfmc != null and pd.xfmc != ''">
+			AND t.xfmc LIKE
+			concat('%',#{pd.xfmc},'%')
+		</if>
+		<if test="pd.xfsh != null and pd.xfsh != ''">
+			AND t.xfsh LIKE
+			concat('%',#{pd.xfsh},'%')
+		</if>
+		<if test="pd.sjjgbm!=null and pd.sjjgbm!=''">
+			AND t.jgbm like concat( #{pd.sjjgbm},'%') or (t.jgbm=#{pd.sjjgbm} and t.del_flag=0)
+		</if>
+		order by t.jgbm asc
+	</select>
+	<!-- <resultMap id="zzjgChilds" type="com.shbw.entity.ZzjgTreeNode"> <id column="jgbm" property="jgbm" /> <result column="xfmc" property="xfmc" /> <result column="sjjgbm" property="sjjgbm" /> </resultMap> 
+		<select id="selectZzjgParent" resultType="com.shbw.entity.ZzjgTreeNode" parameterType="java.lang.String"> select t.xfmc text,t.jgbm,t.sjjgbm from t_xfxx t where t.jgbm=#{jgbm} limit 1 </select> -->
+	<!-- <select id="selectZzjgChlids" resultMap="zzjgChilds" parameterType="java.lang.String"> select t.xfmc text,t.jgbm,t.sjjgbm from t_xfxx t where t.sjjgbm=#{jgbm} order by t.xfmc </select> -->
+	<select id="selectZzjgById" resultType="pd" parameterType="java.lang.String">
+		select id, xfsh, xfmc, xfyh, xfyhzh, xfdz, xfdh, jgbm, sjjgbm, xf_yxtid, creator, create_date, updator, update_date, del_flag,zt,
+		remark,ifnull(zpzdje,0) zpzdje,ifnull(ppzdje,0) ppzdje,ifnull((select xfmc from t_xfxx x where t.sjjgbm=x.jgbm and x.del_flag='0'),'快钱') sjjg
+		FROM t_xfxx t where 1=1 and t.del_flag=0 and t.id=#{id}
+	</select>
+	<insert id="insertZzjg" parameterType="pd">
+		insert into t_xfxx ( xfsh , xfmc , xfyh , xfyhzh , xfdz , xfdh , jgbm , sjjgbm , xf_yxtid , creator , create_date , updator , update_date , del_flag
+		,
+		remark,zt)
+		values (#{xfsh},#{xfmc} ,#{xfyh},#{xfyhzh},#{xfdz},#{xfdh},#{jgbm},#{sjjgbm},#{xf_yxtid},#{creator},current_timestamp(),#{updator},#{update_date},'0',#{remark},#{zt})
+	</insert>
+	<update id="delete" parameterType="java.lang.String">
+		update t_xfxx t set t.del_flag=1 where t.id in (${value})
+		<!-- <foreach item="item" index="index" collection="list" open="(" separator="," close=")"> #{item} </foreach> -->
+	</update>
+	<update id="deleteChilldZzjg" parameterType="java.lang.String">
+		update t_xfxx t set t.del_flag=1 where t.sjjgbm like concat( #{value},'%')
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="pd">
+		update t_xfxx set xfsh=#{xfsh},xfmc=#{xfmc} , xfyh=#{xfyh} , xfyhzh=#{xfyhzh} , xfdz=#{xfdz} , xfdh=#{xfdh} , jgbm=#{jgbm} ,
+		updator=#{updator} , update_date=current_timestamp(), remark=#{remark},zt=#{zt}
+		where
+		id=#{id}
+	</update>
+	<select id="selectZzjgTree" resultType="pd">
+		select t.xfmc name,t.jgbm id,t.sjjgbm pId from t_xfxx t where t.del_flag=0 order by t.jgbm asc
+	</select>
+	<select id="selectZzjgBySjjgbm" resultType="pd" parameterType="java.lang.String">
+		SELECT id, xfsh, xfmc, xfyh, xfyhzh, xfdz, xfdh, jgbm, sjjgbm, xf_yxtid, creator, create_date, updator, update_date, del_flag,
+		remark FROM t_xfxx t where t.del_flag=0
+		and sjjgbm=#{jgbm}
+	</select>
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+	<select id="selectXfmc" resultType="pd">
+		select t.xfmc,t.id from t_xfxx t where t.del_flag=0 order by t.jgbm asc
+	</select>
+	<select id="getJgbmCount"  resultType="pd" parameterType="java.lang.String">
+		select count(*) counts from t_xfxx t where t.del_flag=0 and t.jgbm=#{jgbm}
+	</select>
+</mapper>

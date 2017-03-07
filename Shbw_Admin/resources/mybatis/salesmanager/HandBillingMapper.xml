@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Create By Aiwen at 2017-01-16-->
+<mapper namespace="HandBillingMapper">
+	<select id="selectKpds" parameterType="java.lang.String" resultType="pd">
+		<!-- select t.id,t.kpdmc from t_kpdxx t where t.zzjgId=#{value} -->
+		select t.id,t.xfmc from t_xfxx t where t.del_flag=0
+	</select>
+	<insert id="insertKpls" parameterType="pd" useGeneratedKeys="true" keyProperty="id">
+		insert into t_kpls
+		(kplsh,fplx,sqlx,lcjd,zhlx,zhbh,cplb,ywlx,jslx,hjse,hjje,jshj,xfid,xfsh,xfmc,xfyh,xfyhzh,xfdz,xfdh,gfid,gfsh,gfmc,gfyh,gfyhzh,gfdz,gfdh,yjdz,gfyb,creator,create_date,del_flag,remark,ygsid,skr,kpbz,qdbz,kprq,tzdbh,yfpdm,yfphm,fpdm,fphm) values
+		(#{kplsh},#{fplx},#{sqlx},#{lsjd},#{zhlx},#{zhbm},#{cplb},#{ywlx},#{jslx},#{hjse},#{hjje},#{jshj},#{xfcustomerId},#{xfsh},#{xfmc},#{xfyh},#{xfyhzh},#{xfdz},#{xfdh},#{customerId},#{gfsh},#{gfmc},#{gfyh},#{gfyhzh},#{gfdz},#{gfdh},#{yjdz},#{gfyb},#{creator},current_timestamp(),'0',#{xfbz},'x',#{skr},#{kpbz},#{qdbz},#{kprq},#{tzdbh},#{yfpdm},#{yfphm},#{fpdm},#{fphm})
+	</insert>
+	<!-- 新增开票明细 -->
+	<insert id="insertKpmx" parameterType="pd">
+		insert into t_kpmx (
+		kplsh,kpmxId,jylsh,spmxxh,spmc,spbm,spje,spse,
+		dw,ggxh,dj,spsl,sl,hsbz,fphxz,creator,create_date,del_flag,
+		hsslbs,yhzcbs,bhsspje,bhsdj
+		)
+		VALUES (
+		#{kplsh},#{kpmxId},#{jylsh},#{spmxxh},#{spmc},#{spbm},#{spje},#{spse},
+		#{dw},#{ggxh},#{dj},#{spsl},#{sl},#{hsbz},#{fphxz},#{creator},#{create_date},0,
+		0,0,#{bhsspje},#{bhsdj}
+		)
+	</insert>
+	<!-- 商品编码与名称查询 -->
+	<select id="spbmMc" resultType="pd">
+	 	select spbm,yspmc from t_spbmdz t where t.del_flag=0 order by id desc
+	</select>
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+</mapper>

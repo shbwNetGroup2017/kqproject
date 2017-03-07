@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shenheMapper">
+	<sql id="kplsColumns">t.id,t.kplsh,t.fplx,t.sqlx,t.lcjd,t.kpbz,t.zhlx,t.zhbh,t.cplb,t.ywlx,t.jslx,t.fpdm,t.fphm,t.kprq,
+	t.ewm,t.jym,t.mwq,t.ygsid,t.hjse,t.hjje,t.jshj,t.xfid,t.xfsh,t.xfmc,t.xfyh,t.xfyhzh,t.xfdz,t.xfdh,t.gfid,t.gfsh,t.gfmc,t.gfyh,
+	t.gfyhzh,t.gfdz,t.gfdh,t.gflxrdh,t.gflxr,t.yjdz,t.gfyb,t.zhsl,t.hsslbs,t.jmbbh,t.zyspmc,t.kpjh,t.qdbz,t.spsm,t.tspz,t.ssyf,
+	t.tzdbh,t.yfphm,t.yfpdm,t.qmcs,t.bz,t.skr,t.kpr,t.zfr,t.fhr,t.creator,t.create_date,t.updator,t.update_date,t.del_flag,
+	t.remark,t.sqsj,t.sklx,t.sjzclq,t.sjly
+	</sql>
+	<sql id="kpmxColumns">
+		t.id,t.kplsh,t.kpmxId,t.jylsh,t.spmxxh,t.spbm,t.spmc,t.spje,t.bhsspje,t.spse,t.dw,
+		t.ggxh,t.dj,t.bhsdj,t.spsl,t.sl,t.hsbz,t.fphxz,t.kcje,t.yhzcbs,t.slbs,t.zzstsgl,t.spsm,
+		t.creator,t.create_date,t.updator,t.hsslbs,t.del_flag
+	</sql>
+	
+	<!-- 查询票据审核t_kpls列表 -->
+	<select id="selectAlllistPage" parameterType="page" resultType="pd">
+		SELECT m.id,m.kplsh,m.fplx,m.sqlx,m.lcjd,m.zhlx,m.zhbh,m.cplb,m.ywlx,m.jslx,m.fpdm,m.fphm,m.kprq,m.ewm,m.jym,m.mwq,m.xfid,m.xfsh,
+			m.xfmc,m.xfyh,m.xfyhzh,m.xfdz,m.xfdh,m.ygsid,
+			m.gfid,m.gfsh,m.gfmc,m.gfyh,m.gfyhzh,m.gfdz,m.gfdh,m.gflxrdh,m.gflxr,m.yjdz,m.gfyb,
+			m.yfphm,m.yfpdm,m.bz,m.skr,m.kpr,m.zfr,m.fhr,m.hjse,m.hjje,m.jshj,
+			m.creator,m.create_date,m.updator,m.update_date,m.del_flag,m.remark,m.sqsj,m.sjzclq,n.gfmc khmc
+			FROM t_kpls m left join t_gfxx n ON m.ygsid = n.id where m.del_flag = 0 and kpbz not in ('1','2','3') and sfhzc='0'
+			and (m.lcjd in(2,3) and m.id in (${pd.ids}))
+		<if test="pd.xfmc != null and pd.xfmc != '' ">
+			 and m.xfmc like concat('%',#{pd.xfmc},'%')
+		</if>
+		<if test="pd.gfmc != null and pd.gfmc != '' ">
+			 and n.gfmc like concat('%',#{pd.gfmc},'%')
+		</if>
+		<if test="pd.fplx != null and pd.fplx != '' ">
+			 and m.fplx = #{pd.fplx}
+		</if>
+		<if test="pd.sqlx != null and pd.sqlx != '' ">
+			 and m.sqlx = #{pd.sqlx}
+		</if>
+		<if test="pd.sklx != null and pd.sklx != '' ">
+			 and m.sklx = #{pd.sklx}
+		</if>
+		<if test="pd.sqsjStart !=null and pd.sqsjStart !=''">
+			and m.sqsj  <![CDATA[ >= ]]> #{pd.sqsjStart}
+		</if>
+		<if test="pd.sqsjEnd !=null and pd.sqsjEnd !=''">
+			and m.sqsj  <![CDATA[ <= ]]> #{pd.sqsjEnd}
+		</if>
+		order by m.lcjd
+	</select>
+	<!-- ********************** -->
+	<insert id="insert" parameterType="pd" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_kpls(kplsh,lcjd,xfid,xfsh,xfmc,xfyh,xfyhzh,xfdz,xfdh,
+		sqlx,ygsid,ywlx,zhlx,zhbh,fplx,cplb,gfsh,gfmc,gfid,gfyh,gfyhzh,gfdz,gfdh,
+		jslx,hjse,hjje,jshj,gflxr,gflxrdh,yjdz,gfyb,remark,del_flag,creator,create_date,kpbz,qmcs,sqsj,qdbz,sklx) VALUES (
+		#{kplsh},#{saveOrsubmit},#{xfid},#{xfsh},#{xfmc},#{xfyh},#{xfyhzh},#{xfdz},#{xfdh},
+		#{sqlx},#{ygsid},#{ywlx},#{zhlx},#{zhbh},#{fplx},#{cplb},#{gfsh},#{gfmc},#{gfid},#{gfyh},#{gfyhzh},#{gfdz},#{gfdh},
+		#{jslx},#{hjse},#{hjje},#{jshj},#{gflxr},#{gflxrdh},#{yjdz},#{gfyb},#{remark},#{del_flag},#{creator},#{create_date},#{kpbz},
+		#{qmcs},#{sqsj},#{qdbz},#{sklx}
+		)
+	</insert>
+	
+	<!-- 批量删除票据申请-->
+	<update id="deleteKpls" parameterType="String">
+		update t_kpls set del_flag = 1
+		where
+		id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	
+	<select id="findGfById" parameterType="pd" resultType="pd">
+		SELECT id,gfmc from t_gfxx g where g.id in (
+			SELECT ttid from t_ttxx where khid = #{id}
+		)
+	</select>
+	
+	<select id="findKhzje" parameterType="pd" resultType="pd">
+		SELECT id,zje,ykpje from t_khljje 
+		where gf_yxtid = (
+		SELECT gf_yxtid from t_gfxx where id = #{ygsid}
+		)
+		and ywlx = #{ywlx}
+		and jslx = #{jslx}
+		and jylsly = #{jylsly}
+		<if test="zhlx==terminal_id">
+			and terminal_id = #{zhbh}
+		</if>
+		<if test="zhlx==jszh">
+			and jszh = #{zhbh}
+		</if>
+		<if test="zhlx==kqzh">
+			and kqzh = #{zhbh}
+		</if>
+		<if test="zhlx==merchant_id">
+			and merchant_id = #{zhbh}
+		</if>
+		 
+	</select>
+	<select id="findGfyxtid" parameterType="String" resultType="pd">
+		SELECT gf_yxtid,gfmc,id,gfsh,gfyh,gfyhzh,gfdz,gfdh,gflx from t_gfxx where id = #{ygsid}
+	</select>
+
+	
+	<!-- 根据订单id计算可开票金额 -->
+	<select id="jszjeByDdid" parameterType="String" resultType="pd">
+		SELECT SUM(jshj) zje from t_jyls where id in (${ddids})
+	</select>
+	<!-- 订单交易明细表中根据交易流水号计算合计金额，合计税额 -->
+	<select id="jsJsAndSeByJylsh" parameterType="String" resultType="pd">
+		SELECT SUM(spje) hjje,SUM(spse) hjse from t_ddljymx where jylsh in (${ids})
+	</select>
+	
+	<!-- 查询订单信息 -->
+	<select id="selectDdByJylsh_old" parameterType="pd" resultType="pd">
+		select m.id,m.jylsh,m.spmxxh,m.yspbm,m.spje,m.spse,m.dw,m.ggxh,m.dj,m.spsl,
+		m.sl,m.hsbz,m.fphxz,m.kpzt,n.spbm,n.yspmc spmc from t_ddljymx m
+		LEFT JOIN  t_spbmdz n on m.yspbm = n.yspbm and n.del_flag = 0 
+		where m.jylsh in (${ids})
+	</select>
+	<!-- 查询订单信息 -->
+	<select id="selectDdByJylsh" parameterType="pd" resultType="pd">
+		select m.id,m.jylsh,m.yspbm,m.spbm,m.spmc,
+		m.spje,m.spse,m.dw,m.ggxh,m.dj,m.spsl,
+		m.sl,m.hsbz	from t_ddljymx m
+		where m.jylsh in (${ids})
+	</select>
+	<!-- 根据订单id修改订单状态 -->
+	<update id="updateDdzt" parameterType="String">
+		UPDATE t_jyls SET kpzt = #{kpzt} where id in (${ddids})
+	</update>
+	<!-- 根据开票流水号，在明细表里查询订单的交易流水号 -->
+	<select id="selectDdJylshByKplsh" parameterType="pd" resultType="pd">
+		SELECT jylsh from t_kpmx where kplsh = #{kplsh};
+	</select>
+	<!-- 删除开票流水数据 -->
+	<delete id="deleteWlKpls" parameterType="String">
+		delete from t_kpls where id = ${id}
+	</delete>
+	<!-- 删除开票明细 -->
+	<delete id="deleteKpmx" parameterType="String">
+		delete from t_kpmx where kplsh = #{kplsh}
+	</delete>
+	<!-- 删除非订单类交易细表 -->
+	<delete id="deleteFddljymx" parameterType="String">
+		delete from t_khyljje where kplsh = #{kplsh}
+	</delete>
+	<!-- 根据开票流水号，查询订单id -->
+	<select id="selectDdidAndJylshByKplsh" parameterType="pd" resultType="pd">
+		SELECT m.jylsh,n.id from t_kpmx m LEFT JOIN t_jyls n on m.jylsh = n.jylsh
+		WHERE m.kplsh = #{kplsh}
+	</select>
+	<!-- 更加ID,查询kplsh -->
+		<!-- 批量删除票据申请-->
+	<select id="selectKplshById" parameterType="String" resultType="pd">
+		select DISTINCT kplsh from t_kpls where
+		id in
+		<foreach item="item" index="index" collection="array" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+	<!-- 批量删除t_fddljymx -->
+	<update id="updatet_fddljymx" parameterType="pd">
+		update t_khyljje set del_flag = 1 where kplsh in (${delkplsh})
+	</update>
+	<!-- 批量删除t_kpmx -->
+	<update id="updatet_kpmx" parameterType="pd">
+		update t_kpmx set del_flag = 1 where kplsh in (${delkplsh})
+	</update>
+	<update id="updatet_jyls" parameterType="pd">
+		update t_jyls set kpzt = 0 where jylsh in (${delJylshs})
+	</update>
+	<!-- 根据开票流水号，批量查询订单id -->
+	<select id="selectDdidAndJylshByKplsh_pl" parameterType="pd" resultType="pd">
+		SELECT m.jylsh,n.id from t_kpmx m LEFT JOIN t_jyls n on m.jylsh = n.jylsh
+		WHERE m.kplsh in(${delkplsh})
+	</select>
+	<!-- 根据ID修改t_kpls表中lcjd值 -->
+	<update id="updatet_kplsLcjd" parameterType="pd">
+		update t_kpls set lcjd = #{lcjd} where id = #{id}
+	</update>
+	<!-- 查询用户组 -->
+	<select id="selectYhz" parameterType="pd" resultType="pd">
+		select id,yhzmc,yhzms,zzjgid,remark from t_yhz
+	</select>
+	<select id="selectYhByYhzid" parameterType="pd" resultType="pd">
+		SELECT id,yhzh,yhmc from t_yhgl WHERE id in (
+			SELECT yhid from t_yhzyh where yhzid = #{yhzid} 
+		)
+	</select>
+	<!-- 查询业务类型 -->
+	<select id="selectYwlx" parameterType="pd" resultType="pd">
+		select id,dmbh,lxmc,bz from t_dm where ywlx='t_kpywlx' and del_flag =0
+	</select>
+	<!-- 修改客户累计金额 -->
+	<update id="updateKhljje" parameterType="pd">
+		update t_khljje set zje=#{zje},ykpje=#{ykpje} where id = #{id}
+	</update>
+	<!-- 查询客户账号编号 -->
+	<select id="selectKhbm" parameterType="pd" resultType="pd">
+		select ${zhlx} khbm from t_khljje where gf_yxtid=(
+		SELECT gf_yxtid from t_gfxx where id=#{ygsid}
+		) and ${zhlx} is NOT NULL 
+	</select>
+	<!-- 根据id查询开票流水信息 -->
+	<select id="findKplsById" parameterType="pd" resultType="pd">
+		select 
+			<include refid="kplsColumns"/>
+		 from t_kpls t where t.id = #{id}
+	</select>
+	<!-- 修改kpls中的jcjd -->
+	<update id="updateLcjd" parameterType="pd">
+		update t_kpls set lcjd = #{lcjd} where id = #{id}
+	</update>
+	<!-- 新增批注信息 -->
+	<insert id="insertComment" parameterType="pd">
+		insert into t_pzxx (kplsId,comment,creator,create_date,remark) VALUES (
+		#{kplsId},#{comment},#{creator},#{create_date},#{remark}
+		)
+	</insert>
+	<!-- 查询批注信息 -->
+	<select id="selectComment" parameterType="pd" resultType="pd">
+		select id,kplsId,comment,creator,create_date,remark from t_pzxx where kplsId = #{kplsId}
+	</select>
+	<!-- 查询用户组成员 -->
+	<select id="selectYhByYhz" parameterType="pd" resultType="pd">
+	SELECT id,yhzh,yhmc from t_yhgl where id in (
+			SELECT yhid from t_yhzyh where yhzid in (
+		SELECT id from t_yhz where yhzmc =#{yhzmc}
+		)
+	)
+	</select>
+	<!-- 修改t_kpls表中的sjzclq -->
+	<update id="updatesjzclq">
+		update t_kpls set sjzclq=#{sjzclq} where id= #{id}
+	</update>
+	<!-- 查询开票明细 -->
+	<select id="selectKpmxByKplshlistPage" parameterType="page" resultType="pd">
+		select
+		 <include refid="kpmxColumns"/>
+		from t_kpmx t where t.kplsh = #{pd.kplsh}
+	</select>
+	<!-- 修改t_kpls中的复合人 -->
+	<update id="updateFhr" parameterType="pd">
+		update t_kpls set fhr=#{fhr} where id = #{id}
+	</update>
+</mapper>

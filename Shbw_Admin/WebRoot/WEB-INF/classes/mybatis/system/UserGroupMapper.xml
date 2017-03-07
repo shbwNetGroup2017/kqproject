@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserGroupMapper">
+
+	<sql id="userGroupColumns">
+	   id,yhzmc,yhzms,zzjgid,creator,create_date,updator,update_date,remark,zt
+	</sql>
+
+	<!-- 用户组列表(全部) -->
+	<select id="findUserGrouplistPage" parameterType="page" resultType="pd">
+		select 
+		  <include refid="userGroupColumns"/>
+		from t_yhz t where t.del_flag='0'
+		<if test="pd.yhzmc != null and pd.yhzmc != ''">
+		    and t.yhzmc like concat('%',#{pd.yhzmc},'%')
+		</if>
+		order by t.create_date desc
+	</select>
+	
+	<!-- 用户组信息的查询-->
+	<select id="findUserGroupById" parameterType="pd" resultType="pd">
+	    select
+	      <include refid="userGroupColumns"/>
+	    from t_yhz t where t.del_flag='0' and id=#{id}
+	</select>
+	
+	<!-- 根据id修改数据对象 -->
+	<update id="updateUserGroupById" parameterType="pd">
+	    update t_yhz set
+	       yhzmc=#{yhzmc},
+	       yhzms=#{yhzms},
+	       zt=#{zt},
+	       updator=#{username},
+	       update_date=SYSDATE(),
+	       remark=#{remark}
+       where id=#{id}
+	</update>
+	
+	<!-- 插入 开票点信息 -->
+	<insert id="insertUserGroup" parameterType="pd">
+		insert into t_yhz(
+			yhzmc,
+			yhzms,
+			zt,
+	        creator,
+	        create_date,
+	        del_flag,
+	        remark
+		) value (
+			#{yhzmc},
+			#{yhzms},
+			#{zt},
+			#{username},
+			SYSDATE(),
+			'0',
+			#{remark}
+		)
+	</insert>
+	
+	<!-- 删除开票点信息 -->
+	<update id="deleteUserGroupInfo" parameterType="java.lang.String">
+		update t_yhz t set t.del_flag=1 where id in (${value})
+	</update>
+</mapper>

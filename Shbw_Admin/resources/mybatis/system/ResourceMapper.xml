@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ResourceMapper">
+	
+	<select id="selectlistPage" parameterType="page" resultType="pd">
+		SELECT
+			t.id,
+			t.zymc,
+			t.zylj,
+			t.zyxh,
+			t.zyms,
+			t.zt,
+			t.creator,
+			t.create_date,
+			t.updator,
+			t.update_date,
+			t.del_flag,
+			t.remark,
+			IF((t.zyxh like '__'),'',IF((LENGTH(t.zyxh)=4),(select l.zymc from t_zygl l where l.del_flag='0' and l.zyxh=SUBSTRING(t.zyxh,1,2)),'')) as fzy
+		FROM
+			t_zygl t
+			where 1=1 and t.del_flag='0'
+			<if test="pd.zymc != null and pd.zymc != ''">
+				and t.zymc like concat('%',#{pd.zymc},'%')
+			</if>
+			<if test="pd.zyxh != null and pd.zyxh != ''">
+				and t.zyxh like  concat(#{pd.zyxh},'%%')		
+			</if>
+			ORDER BY t.zyxh asc
+	</select>
+	
+	<select id="selectlistMenu" parameterType="pd" resultType="pd">
+		SELECT
+			t.id,
+			t.zymc,			
+			t.zyxh
+		FROM
+			t_zygl t
+			where t.zyxh like #{zyxh} and t.del_flag='0'
+			ORDER BY t.zyxh asc
+	</select>
+	
+	<select id="selectlistRole" parameterType="pd" resultType="pd">
+		SELECT
+			j.id,
+			j.jsmc			
+		FROM
+			t_jsgl j
+			where j.del_flag='0'
+			ORDER BY j.id asc
+	</select>
+	
+	<select id="selectobjResource" parameterType="pd" resultType="pd">
+		SELECT
+			t.id,
+			t.zymc,
+			t.zylj,
+			t.zyxh,
+			t.zyms,
+			t.zt,
+			t.creator,
+			t.create_date,
+			t.updator,
+			t.update_date,
+			t.del_flag,
+			t.remark,
+			IF((t.zyxh like '__'),'',IF((LENGTH(t.zyxh)=4),(select l.zymc from t_zygl l where l.del_flag='0' and l.zyxh=SUBSTRING(t.zyxh,1,2)),'')) as fzy
+		FROM
+			t_zygl t
+			where 1=1 and t.del_flag='0'
+			<if test="id != null and id != ''">
+				and t.id = #{id}		
+			</if>
+	</select>
+	
+	<select id="selectResource" parameterType="pd" resultType="pd">
+		select id from t_zygl where del_flag='0' and zyxh=#{zyxh}
+	</select>
+	
+	<update id="updateResource" parameterType="pd">
+			update t_zygl set 	
+				zymc = #{zymc}
+				, zylj = #{zylj}
+				, zyxh = #{zyxh}
+				, zyms = #{zyms}
+				, zt = #{zt}
+				, updator=#{updator}
+				,update_date=SYSDATE()
+		WHERE  id = #{id}
+	</update>
+	
+	<insert id="insertResource" parameterType="pd">
+		insert into t_zygl( 
+			zymc, 
+			zylj, 
+			zyxh, 
+			zyms, 
+			zt, 
+			creator, 
+			create_date, 
+			remark
+		) values (
+			#{zymc},
+			#{zylj},
+			#{zyxh},
+			#{zyms},
+			#{zt},
+			#{creator},
+			SYSDATE(),
+			#{remark}
+		)
+	</insert>
+	
+	<update id="deleteResource" parameterType="pd">
+		update t_zygl set del_flag='1' where 1=1
+		<if test="id != null and id != ''">
+				and id = #{id}		
+		</if>
+		<if test="zyxh != null and zyxh != ''">
+				and zyxh like #{zyxh}		
+		</if>
+	</update>
+	
+	<select id="selectRsZyxh" parameterType="pd" resultType="pd">
+		select max(l.zyxh) as zyxh from t_zygl l where l.zyxh like #{zyxh} and l.del_flag='0'
+	</select>
+
+</mapper>

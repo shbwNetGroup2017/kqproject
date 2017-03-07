@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CustomerInfoMapper">
+	<select id="customerInfoslistPage" parameterType="page" resultType="pd">
+		SELECT id, gfsh, gfmc, gfyh, gfyhzh, gfdz, gfdh,  gflx, creator, create_date, updator, updata_date, sjly, gf_yxtid, del_flag,zt, remark FROM
+		t_gfxx t
+		<where>
+			t.del_flag=0
+		</where>
+		<if test="pd.gfmc != null and pd.gfmc != ''">
+			AND t.gfmc LIKE
+			concat('%',#{pd.gfmc},'%')
+		</if>
+		<if test="pd.gfsh != null and pd.gfsh != ''">
+			AND t.gfsh LIKE
+			concat('%',#{pd.gfsh},'%')
+		</if>
+		<if test="pd.gflx!= null and pd.gflx != ''">
+			AND t.gflx=#{pd.gflx}
+		</if>
+		<if test="pd.khid!=null and pd.khid!=''">
+		    AND t.id not in (select ttid from t_ttxx tt where tt.khid=#{pd.khid} )
+		</if>
+		order by t.id asc
+	</select>
+	<select id="customerTtInfoslistPage" parameterType="page" resultType="pd">
+		select g.gfmc,g.gfsh,g.gfdz,g.gfdh,t.fileName from t_ttxx t left join t_gfxx g on t.ttid =g.id 
+		<where>
+			t.del_flag=0
+		</where>
+		<if test="pd.khid != null and pd.khid != ''">
+			AND t.khid=#{pd.khid}
+		</if>
+		order by t.id asc
+	</select>
+	<select id="customerTtInfosList" parameterType="java.lang.String" resultType="java.lang.String">
+		select ifnull(t.fileName,0) fileName from t_ttxx  t
+		<where>
+			t.del_flag=0
+		</where>
+		
+			AND t.khid in (select gf_yxtid from t_gfxx g where g.id in (${value}))
+		order by t.id asc
+	</select>
+	<insert id="insertCustomerInfo" parameterType="pd" useGeneratedKeys="true" keyProperty="id">
+		insert into t_gfxx ( yxtid, gfsh, gfmc, gfyh, gfyhzh, gfdz, gfdh,  gflx,  creator, create_date, sjly, gf_yxtid, zt,del_flag, remark) VALUES
+		(#{yxtid}, #{gfsh}, #{gfmc},
+		#{gfyh}, #{gfyhzh}, #{gfdz}, #{gfdh},  #{gflx}, #{creator}, current_timestamp(), #{sjly}, #{gf_yxtid}, #{zt},#{del_flag},
+		#{remark})
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="java.lang.String">
+		update t_gfxx set
+		gflx=#{gflx},gfmc=#{gfmc},gfsh=#{gfsh},gfyh=#{gfyh},gfyhzh=#{gfyhzh},gfdz=#{gfdz},gfdh=#{gfdh},zt=#{zt},yxtid=#{yxtid},sjly=#{sjly},updator=#{updator}
+		,updata_date=current_timestamp()
+		where id=#{id}
+	</update>
+	<select id="selectCustomerInfoById" parameterType="java.lang.String" resultType="pd">
+		SELECT id, gfsh, gfmc, gfyh, gfyhzh, gfdz, gfdh,  gflx,   creator, create_date, updator,
+		updata_date, sjly, gf_yxtid,yxtid, del_flag, remark,zt FROM
+		t_gfxx t where t.id=#{id}
+	</select>
+	<update id="delete" parameterType="java.lang.String">
+		update t_gfxx t set t.del_flag=1 where id in (${value})
+		<!-- <foreach item="item" index="index" collection="list" open="(" separator="," close=")"> #{item} </foreach> -->
+	</update>
+	<update id="deleteTtxx" parameterType="java.lang.String">
+		update t_ttxx t set t.del_flag=1 where khid in (select gf_yxtid from t_gfxx g where g.id in (${value}))
+	</update>
+	<insert id="insertTtxx" parameterType="pd">
+		insert into t_ttxx (khid,ttid,creator,create_date,fileName,del_flag) value(#{gf_yxtid},#{ttid},#{creator},current_timestamp(),#{fileName},'0')
+	</insert>
+	<!-- add by Aiwen at 2017-01-13 -->
+	<select id="customerInfoslist" resultType="pd" parameterType="pd">
+		select t.id,t.gfmc from t_gfxx t where t.del_flag=0 
+		<if test="gfmc != null and gfmc != ''">
+			AND t.gfmc LIKE
+			concat('%',#{gfmc},'%')
+		</if>
+		order by t.id asc  limit 0,9 
+	</select>
+	<!-- end at 2017-01-13 by Aiwen -->
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+</mapper>

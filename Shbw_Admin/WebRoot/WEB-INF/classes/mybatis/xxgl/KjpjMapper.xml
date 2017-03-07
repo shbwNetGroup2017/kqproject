@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KjpjMapper">
+	<select id="selectlistPage" parameterType="page" resultType="pd">
+		SELECT
+			t.id,
+			t.kplsh,
+			t.xfmc,
+			t.xfsh,
+			t.kpbz,
+			t.qdbz,
+			g.gfmc as khmc,
+			g.gfsh as khsh,
+			t.gfmc,
+			t.fplx,
+			t.jshj,
+			t.hjje,
+			t.hjse,
+			t.skr,
+			(SELECT count(id) from t_kpmx x where x.kplsh=t.kplsh and x.del_flag='0') as len			
+		FROM
+			t_kpls t
+			left join t_gfxx g on g.id=t.ygsid and g.del_flag='0'
+			where 1=1 and t.del_flag='0' and t.lcjd='3' and t.kpbz='0'
+			<if test="pd.xfmc != null and pd.xfmc != ''">
+				and t.xfmc like concat('%',#{pd.xfmc},'%')
+			</if>
+			<if test="pd.gfmc != null and pd.gfmc != ''">
+				and g.gfmc like  concat(#{pd.gfmc},'%%')		
+			</if>
+			<if test="pd.sqsjLoginStart != null and pd.sqsjLoginStart != ''">
+				and t.sqsj &gt;=#{pd.sqsjLoginStart}		
+			</if>
+			<if test="pd.sqsjLoginEnd != null and pd.sqsjLoginEnd != ''">
+				and t.sqsj  &lt;=#{pd.sqsjLoginEnd}		
+			</if>
+			<if test="pd.xfsh != null and pd.xfsh != ''">
+				and t.xfsh = #{pd.xfsh}
+			</if>
+			<if test="pd.fplx != null and pd.fplx != ''">
+				and t.fplx = #{pd.fplx}
+			</if>
+			<if test="pd.sqlx != null and pd.sqlx != ''">
+				and t.sqlx = #{pd.sqlx}
+			</if>
+			ORDER BY t.sqsj desc
+	</select>
+	
+	<select id="selectobjkJPj" parameterType="pd" resultType="pd">
+		SELECT
+			s.gfmc,
+			s.gfsh,
+			s.gfdz,
+			s.gfdh,
+			s.gfyh,
+			s.gfyhzh,
+			s.hjje,
+			s.hjse,
+			s.jshj
+		FROM
+			t_kpls s
+		where 1=1 and s.del_flag='0' and s.id=#{id}
+	</select>
+	
+	<select id="listAllKpmx" parameterType="pd" resultType="pd">
+		SELECT
+			x.spmc,
+			x.ggxh,
+			x.dw,
+			x.spsl,
+			x.dj,
+			x.bhsdj,
+			x.spje,
+			x.bhsspje,
+			x.sl,
+			x.spse
+		FROM
+			t_kpmx x
+		where 1=1 and x.del_flag='0' and x.kplsh=#{kplsh}
+	</select>
+	
+	<select id="selectKpmxlistPage" parameterType="page" resultType="pd">
+		SELECT
+			x.spmc,
+			x.ggxh,
+			x.dw,
+			x.spsl,
+			x.dj,
+			x.spje,
+			x.sl,
+			x.spse
+		FROM
+			t_kpmx x
+		where 1=1 and x.del_flag='0' and x.kplsh=#{pd.kplsh}			
+			ORDER BY x.create_date desc
+	</select>
+	
+	<select id="listObjKpmx" parameterType="pd" resultType="pd">
+		SELECT
+			p.fphxz,
+			p.spmc,
+			p.spsm,
+  			p.ggxh,
+  			p.dw,
+			p.spsl,
+  			p.dj,
+  			p.bhsdj,
+  			p.spje,
+  			p.bhsspje,
+  			p.kcje,
+  			p.spse,
+  			p.sl,
+  			p.hsbz,
+			p.spbm,
+			p.yhzcbs,
+		  	p.slbs,
+		  	p.zzstsgl
+		FROM t_kpmx p
+			WHERE p.del_flag='0' AND p.kplsh=#{kplsh}
+	</select>
+	
+	<select id="listObjKpls" parameterType="pd" resultType="pd">
+			SELECT
+				k.skph,
+			    k.skpkl,
+				k.skpmm,
+				s.fplx,
+				s.kpbz,
+				s.tspz,
+				s.xfsh,
+				s.xfmc,
+			    s.xfdz,
+			    s.xfdh, 
+			    s.xfyh,
+				s.xfyhzh,
+				s.gfsh,
+				s.gfmc,
+			    s.gfdz,
+			    s.gfdh, 
+			    s.gfyh,
+				s.gfyhzh,
+				s.hsslbs,
+				s.zhsl,
+			    s.hjje,
+			    s.hjse,
+			    s.jshj,
+			    s.bz,
+			    s.skr,
+			    s.fhr,
+			    s.kpr,
+				s.jmbbh,
+				s.zyspmc,
+			    s.spsm,
+				s.qdbz,
+			    s.ssyf,
+			    s.kpjh,
+			    s.tzdbh,
+			    s.yfpdm,
+			    s.yfphm,
+			    s.qmcs
+			FROM
+				t_kpls s
+			LEFT JOIN t_xfxx f ON f.id=s.xfid
+			LEFT JOIN t_kpdxx k ON k.zzjgId=f.id
+				WHERE s.del_flag='0' AND s.kplsh=#{kplsh}
+				AND s.kpr=#{kpr} AND k.skph=#{skph}
+	</select>
+	
+	<update id="updateKpls" parameterType="pd">
+			update t_kpls set kpr=#{kpr} where id=#{id}
+	</update>
+	<update id="updateCgfxKpls" parameterType="pd">
+			update t_kpls set fpdm=#{fpdm},fphm=#{fphm},kprq=SYSDATE(),lcjd='4' where id=#{id}
+	</update>
+	<update id="updateSbfxKpls" parameterType="pd">
+			update t_kpls set kprq=SYSDATE(),lcjd='5' where id=#{id}
+	</update>
+	<update id="updateXfxx" parameterType="pd">
+			UPDATE t_xfxx 
+				SET ppzdje = #{ppzdje},
+				 zpzdje = #{zpzdje}
+				WHERE
+					id = (
+						select p.id from 
+						(SELECT
+							f.id
+						FROM
+							t_xfxx f
+						LEFT JOIN t_kpdxx x ON x.zzjgId=f.id where x.skph = #{skph})p	
+					)
+	</update>
+
+</mapper>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OrderMapper">
+
+	 <!-- 查询订单列表 -->
+	<select id="getOrderlistPageInfo" parameterType="page" resultType="pd">
+		SELECT
+	tj.id,
+	tj.jylsh,
+	tj.jylssj,
+	tj.gf_yxtid,
+	tg.gfmc,
+	tj.jshj,
+	tj.kpzt
+	FROM
+		t_jyls tj left join t_gfxx tg on tj.gf_yxtid = tg.gf_yxtid 
+	WHERE 1=1
+	    <if test="pd.jylsh != null and pd.jylsh != ''">
+		    and tj.jylsh = #{pd.jylsh}
+		</if>
+		<if test="pd.khmc != null and pd.khmc != ''">
+		 and tg.gfmc like concat('%',#{pd.khmc},'%')
+		</if>
+		<if test="pd.jylshs != null and pd.jylshs != ''">
+   		 and tj.jylsh in(${pd.jylshs})
+		</if>
+	</select>
+	<!-- 查询订单明细列表 -->
+	<select id="getOrderMXlistPageInfo" parameterType="page" resultType="pd">
+	 SELECT
+	 td.id,
+	td.yspbm,
+	td.spje,
+    ts.yspmc,
+	td.dw,
+	td.ggxh,
+	td.dj,
+	td.spsl,
+	td.kpzt
+	FROM
+		t_ddljymx td left join
+		t_spbmdz ts on td.yspbm=ts.yspbm
+	WHERE  1=1 and td.jylsh=#{pd.jylsh}
+	</select>
+	<!-- 删除对应的交易流水信息 -->
+	<delete id="deleteOrder" parameterType="pd">
+		delete from t_jyls where jylsh= #{jylsh}
+	</delete>
+	
+		<!-- 删除对应的流水明细信息 -->
+	<delete id="deleteOrderMX" parameterType="pd">
+		delete from t_ddljymx where 1=1
+		<if test="id != null and id != ''">
+		 and id= #{id}
+		</if>
+		<if test="jylsh != null and jylsh != ''">
+		 and jylsh= #{jylsh}
+		</if>
+	</delete>
+</mapper>

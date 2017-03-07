@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TicketedPointMapper">
+
+	<sql id="ticketedPointColumns">
+	   t.id,t.kpdmc,t.zzjgId,t.skph,t.zcm,t.skpkl,t.creator,t.create_date,t.updator,t.update_date,
+	   t.del_flag,t.remark,xfmc,jgbm
+	</sql>
+
+	<!-- 开票点列表(全部) -->
+	<select id="findTicketedPointlistPage" parameterType="page" resultType="pd">
+		select 
+		  <include refid="ticketedPointColumns"/>
+		from t_kpdxx t,t_xfxx x where t.del_flag='0' and t.zzjgId=x.id
+		<if test="pd.kpdmc != null and pd.kpdmc != ''">
+		    and t.kpdmc like concat('%',#{pd.kpdmc},'%')
+		</if>
+		<if test="pd.skpkl != null and pd.skpkl != ''">
+		    and t.skpkl =#{pd.skpkl}
+		</if>
+		<if test="pd.zzjgdm != null and pd.zzjgdm != ''">
+		    and x.jgbm =#{pd.zzjgdm}
+		</if>
+		<if test="pd.zzjgmc != null and pd.zzjgmc != ''">
+		    and x.xfmc =#{pd.zzjgmc}
+		</if>
+		 order by t.create_date desc
+	</select>
+	
+	<!-- 开票点信息的查询-->
+	<select id="findTicketedPointById" parameterType="pd" resultType="pd">
+	    select
+	      t.id,t.kpdmc,t.zzjgId,t.skph,t.skpmm,t.zcm,t.skpkl,t.creator,t.create_date,t.updator,t.update_date,t.remark
+	    from t_kpdxx t where t.del_flag='0' and id=#{id}
+	</select>
+	
+	<!-- 通过名称查询开票点信息-->
+	<select id="findTicketedPointByName" parameterType="pd" resultType="pd">
+	    select
+	      t.id,t.kpdmc,t.zzjgId,t.skph,t.skpmm,t.zcm,t.skpkl,t.remark
+	    from t_kpdxx t where t.del_flag='0' and kpdmc=#{kpdmc}
+	</select>
+	
+	<!-- 组织结构的查询 -->
+	<select id="findGroupList"  resultType="pd">
+	    select
+	      t.id,t.xfmc
+	    from t_xfxx t where t.del_flag='0'
+	</select>
+	
+	<!-- 根据id修改数据对象 -->
+	<update id="updateTicketedPointById" parameterType="pd">
+	    update t_kpdxx set
+	       kpdmc=#{kpdmc},
+	       zzjgId=#{zzjgId},
+	       skph=#{skph},
+	       skpmm=#{skpmm},
+	       zcm=#{zcm},
+	       skpkl=#{skpkl},
+	       updator=#{username},
+	       update_date=SYSDATE(),
+	       remark=#{remark}
+       where id=#{id}
+	</update>
+	
+	<!-- 插入 开票点信息 -->
+	<insert id="insertTicketedPoint" parameterType="pd">
+		insert into t_kpdxx(
+			kpdmc,
+			zzjgId,
+			skph,
+			skpmm,
+			zcm,
+			skpkl,
+	        creator,
+	        create_date,
+	        del_flag,
+	        remark
+		) value (
+			#{kpdmc},
+			#{zzjgId},
+			#{skph},
+			#{skpmm},
+			#{zcm},
+			#{skpkl},
+			#{username},
+			SYSDATE(),
+			'0',
+			#{remark}
+		)
+	</insert>
+	
+	<!-- 删除开票点信息 -->
+	<update id="deleteTicketedPointInfo" parameterType="java.lang.String">
+		update t_kpdxx t set t.del_flag=1 where id in (${value})
+	</update>
+</mapper>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NonOrderMapper">
+
+	 <!-- 查询订单列表 -->
+	<select id="listNonOrderslistPage" parameterType="page" resultType="pd">
+		SELECT j.jylsly,CASE WHEN j.jylsly='0' THEN
+				'ODS数据仓库'
+				WHEN j.jylsly='1' THEN 'Oracle ERP系统'
+				WHEN j.jylsly='2' THEN '进件系统'
+				WHEN j.jylsly='3' THEN '商派'
+		    END AS jylsly_ch,j.ywlx,j.zje,j.ykpje,  CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				'终端'
+				WHEN j.jszh IS NOT NULL THEN
+				'结算'
+				WHEN j.kqzh IS NOT NULL  THEN
+				'快钱'
+				ELSE
+				'商户'
+				END AS zdlx ,
+				CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				j.terminal_id
+				WHEN j.jszh IS NOT NULL  THEN
+				j.jszh
+				WHEN j.kqzh IS NOT NULL  THEN
+				j.kqzh 
+				ELSE
+				j.merchant_id
+				END AS zd,j.creator,j.create_date,j.updator,j.update_date,j.jslx
+		 from t_khljje j where 1=1 
+	</select>
+	<select id="listNonOrderMXlistPage" parameterType="page" resultType="pd">
+		<!-- 查询交易开始时间t_khyljje_kssj -->
+		<if test="pd.jslx==0">
+			SELECT j.jylsly,CASE WHEN j.jylsly='0' THEN
+				'ODS数据仓库'
+				WHEN j.jylsly='1' THEN 'Oracle ERP系统'
+				WHEN j.jylsly='2' THEN '进件系统'
+				WHEN j.jylsly='3' THEN '商派'
+		    	END AS jylsly_ch,
+		    	j.kplsh,
+		    	j.ywlx,
+		    	j.je,
+		    	CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				'终端'
+				WHEN j.jszh IS NOT NULL THEN
+				'结算'
+				WHEN j.kqzh IS NOT NULL  THEN
+				'快钱'
+				ELSE
+				'商户'
+				END AS zdlx ,
+				CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				j.terminal_id
+				WHEN j.jszh IS NOT NULL  THEN
+				j.jszh
+				WHEN j.kqzh IS NOT NULL  THEN
+				j.kqzh 
+				ELSE
+				j.merchant_id
+				END AS zd,j.creator,j.create_date,j.updator,j.update_date
+		 	from t_khyljje_kssj j where 1=1 
+		</if>
+		<!-- 查询交易结束时间t_khyljje_jssj -->
+		<if test="pd.jslx==1">
+			SELECT j.jylsly,CASE WHEN j.jylsly='0' THEN
+				'ODS数据仓库'
+				WHEN j.jylsly='1' THEN 'Oracle ERP系统'
+				WHEN j.jylsly='2' THEN '进件系统'
+				WHEN j.jylsly='3' THEN '商派'
+		    	END AS jylsly_ch,
+		    	j.kplsh,
+		    	j.ywlx,
+		    	j.je,
+		    	CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				'终端'
+				WHEN j.jszh IS NOT NULL THEN
+				'结算'
+				WHEN j.kqzh IS NOT NULL  THEN
+				'快钱'
+				ELSE
+				'商户'
+				END AS zdlx ,
+				CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				j.terminal_id
+				WHEN j.jszh IS NOT NULL  THEN
+				j.jszh
+				WHEN j.kqzh IS NOT NULL  THEN
+				j.kqzh 
+				ELSE
+				j.merchant_id
+				END AS zd,j.creator,j.create_date,j.updator,j.update_date
+		 	from t_khyljje_jssj j where 1=1 
+		</if>
+		<!-- 交易结算前时间t_khyljje_jsqsj -->
+		<if test="pd.jslx==2">
+			SELECT j.jylsly,CASE WHEN j.jylsly='0' THEN
+				'ODS数据仓库'
+				WHEN j.jylsly='1' THEN 'Oracle ERP系统'
+				WHEN j.jylsly='2' THEN '进件系统'
+				WHEN j.jylsly='3' THEN '商派'
+		    	END AS jylsly_ch,
+		    	j.kplsh,
+		    	j.ywlx,
+		    	j.je,
+		    	CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				'终端'
+				WHEN j.jszh IS NOT NULL THEN
+				'结算'
+				WHEN j.kqzh IS NOT NULL  THEN
+				'快钱'
+				ELSE
+				'商户'
+				END AS zdlx ,
+				CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				j.terminal_id
+				WHEN j.jszh IS NOT NULL  THEN
+				j.jszh
+				WHEN j.kqzh IS NOT NULL  THEN
+				j.kqzh 
+				ELSE
+				j.merchant_id
+				END AS zd,j.creator,j.create_date,j.updator,j.update_date
+		 	from t_khyljje_jsqsj j where 1=1 
+		</if>
+		<!-- 交易结算后时间t_khyljje_jshsj -->
+		<if test="pd.jslx==3">
+			SELECT j.jylsly,CASE WHEN j.jylsly='0' THEN
+				'ODS数据仓库'
+				WHEN j.jylsly='1' THEN 'Oracle ERP系统'
+				WHEN j.jylsly='2' THEN '进件系统'
+				WHEN j.jylsly='3' THEN '商派'
+		    	END AS jylsly_ch,
+		    	j.kplsh,
+		    	j.ywlx,
+		    	j.je,
+		    	CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				'终端'
+				WHEN j.jszh IS NOT NULL THEN
+				'结算'
+				WHEN j.kqzh IS NOT NULL  THEN
+				'快钱'
+				ELSE
+				'商户'
+				END AS zdlx ,
+				CASE
+				WHEN j.terminal_id IS NOT NULL AND j.terminal_id!='' THEN
+				j.terminal_id
+				WHEN j.jszh IS NOT NULL  THEN
+				j.jszh
+				WHEN j.kqzh IS NOT NULL  THEN
+				j.kqzh 
+				ELSE
+				j.merchant_id
+				END AS zd,j.creator,j.create_date,j.updator,j.update_date
+		 	from t_khyljje_jshsj j where 1=1 
+		</if>
+		<!-- zf==0查询金额>0的正数数据 -->
+	    <if test="pd.zf==0">
+		    and j.je&gt;0
+		</if>
+		<!-- zf==1查询金额<0的已开票数据 -->
+		<if test="pd.zf==1">
+		    and j.je&lt;0
+		</if>
+		<if test="pd.khmc != null and pd.khmc != ''">
+		 and tg.gfmc like concat('%',#{pd.khmc},'%')
+		</if>
+		<if test="pd.jylshs != null and pd.jylshs != ''">
+   		 and tj.jylsh in(${pd.jylshs})
+		</if>
+	</select>
+	<!-- 查询订单明细列表 -->
+	<select id="getOrderMXlistPageInfo" parameterType="page" resultType="pd">
+	 SELECT
+	 td.id,
+	td.yspbm,
+	td.spje,
+    ts.yspmc,
+	td.dw,
+	td.ggxh,
+	td.dj,
+	td.spsl,
+	td.kpzt
+	FROM
+		t_ddljymx td left join
+		t_spbmdz ts on td.yspbm=ts.yspbm
+	WHERE  1=1 and td.jylsh=#{pd.jylsh}
+	</select>
+	<!-- 删除对应的交易流水信息 -->
+	<delete id="deleteOrder" parameterType="pd">
+		delete from t_jyls where jylsh= #{jylsh}
+	</delete>
+	
+		<!-- 删除对应的流水明细信息 -->
+	<delete id="deleteOrderMX" parameterType="pd">
+		delete from t_ddljymx where 1=1
+		<if test="id != null and id != ''">
+		 and id= #{id}
+		</if>
+		<if test="jylsh != null and jylsh != ''">
+		 and jylsh= #{jylsh}
+		</if>
+	</delete>
+</mapper>

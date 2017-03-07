@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DataMapper">
+	
+	<!-- 非订单数据信息 -->
+	<insert id="insertWsdlUnDataByUnOrder" parameterType="pd">
+		insert into 
+		 <if test="jslx!=null and jslx==0">
+		    t_khyljje_jshsj
+		 </if>
+		 <if test="jslx!=null and jslx==1">
+		    t_khyljje_jsqsj
+		 </if>
+		 <if test="jslx!=null and jslx==2">
+		    t_khyljje_jssj
+		 </if>
+		 <if test="jslx!=null and jslx==3">
+		    t_khyljje_kssj
+		 </if>
+		(
+			gf_yxtid,jylsly,xf_yxtid,ywlx,je,hsbz,kplsh,terminal_id,jszh,kqzh,merchant_id,del_flag,
+			sjbs,creator,create_date,yxtid
+		) value (
+			#{gf_yxtid},#{jylsly},#{xf_yxtid},#{ywlx},#{je},#{hsbz},'0',#{terminal_id},#{jszh},#{kqzh},
+            #{merchant_id},'0',#{sjbs},'interface',SYSDATE(),#{id}
+		)	
+	</insert>
+	
+	<!-- 订单类数据主表信息 -->
+	<insert id="insertWsdlDataByOrderZ" parameterType="map">
+		insert into t_jyls (
+			jylsh,
+			jylssj,
+			gf_yxtid,
+			jylsly,
+			xf_yxtid,
+			jshj,
+			kpzt,
+			hsbz,
+			bz,
+			skr,
+			kpr,
+			fhr,
+			creator,
+			create_date,
+			hsslbs,
+			kcje
+		) value (
+			#{jylsh},
+			#{jylssj},
+			#{gf_yxtid},
+			#{jylsly},
+			#{xf_yxtid},
+			#{jshj},
+			'0',
+			#{hsbz},
+			#{bz},
+			#{skr},
+			#{kpr},
+			#{fhr},
+			'interface',
+			SYSDATE(),
+			#{hsslbs},
+			#{kcje}
+		)
+	</insert>
+
+	<!-- 订单类数据明细表信息 -->
+	<insert id="insertWsdlDataByOrderM" parameterType="java.util.List">
+		insert into t_ddljymx (
+			jylsh,
+			spbm,
+			spje,
+			spse,
+			dw,
+			ggxh,
+			dj,
+			spsl,
+			sl,
+			yspbm,
+			yspmc,
+			hsbz,
+			kpzt,
+			del_flag,
+			creator,
+			create_date,
+			mx_yxtid,
+			sjly
+		) value
+	   <foreach collection="list" item="map" index="index"
+			separator=","> 
+			(
+				#{map.jylsh},
+				#{map.spbm},
+				#{map.spje},
+				#{map.spse},
+				#{map.dw},
+				#{map.ggxh},
+				#{map.dj},
+				#{map.spsl},
+				#{map.sl},
+				#{map.yspbm},
+				#{map.yspmc},
+				'0',
+				'0',
+				'0',
+				'interface',
+				SYSDATE(),
+				'1111',
+				#{map.sjly}
+			)
+		</foreach>
+	</insert>
+	
+	<!-- 客户数据信息 -->
+	<insert id="insertWsdlDataByCustom" parameterType="map">
+		insert into t_gfxx (
+		    yxtid,
+			gfsh,
+			gfmc,
+			gfyh,
+			gfyhzh,
+			gfdz,
+			gfdh,
+			gflx,
+			zt,
+			gf_yxtid,
+			sjly,
+			del_flag,
+			creator,
+			create_date
+		) value (
+		    #{id},
+			#{gfsh},
+			#{gfmc},
+			#{gfyh},
+			#{gfyhzh},
+			#{gfdz},
+			#{gfdh},
+			#{gflx},
+			'0',
+			#{gf_yxtid},
+			#{sjly},
+			'0',
+			'interface',
+			SYSDATE()
+		)
+	</insert>
+	
+	<!-- 客户信息的删除 -->
+	<delete id="deleteCustomData" parameterType="map">
+	  delete from t_gfxx m where m.yxtid = #{id} and m.sjly=#{sjly}
+	</delete>
+	
+	<!-- 订单类主表信息的删除 -->
+	<delete id="deleteData" parameterType="map">
+	  delete z,m from t_jyls z,t_ddljymx m where 
+	  z.jylsh=#{jylsh} and z.jylsly=#{jylsly} and m.jylsh=#{jylsh} and m.sjly=#{jylsly}
+	</delete>
+	
+	<!-- 订单类主表信息的删除 -->
+	<delete id="deleteDdjylsZ" parameterType="map">
+      delete z,m from t_jyls z,t_ddljymx m where 
+      z.jylsh=#{jylsh} and z.jylsly=#{sjly} and m.jylsh=#{jylsh} and m.sjly=#{sjly}
+	</delete>
+	
+	<!-- 订单类明细表信息的删除 -->
+	<delete id="deleteDdjylsM" parameterType="map">
+	  delete from t_ddljymx m where m.mx_yxtid = #{id} and m.sjly=#{sjly}
+	</delete>
+	
+	<!-- 非订单类信息的删除 -->
+	<delete id="deleteUnDdjyData" parameterType="map">
+	  delete from 
+	  	 <if test="jslx!=null and jslx==0">
+		    t_khyljje_jshsj m
+		 </if>
+		 <if test="jslx!=null and jslx==1">
+		    t_khyljje_jsqsj m
+		 </if>
+		 <if test="jslx!=null and jslx==2">
+		    t_khyljje_jssj m
+		 </if>
+		 <if test="jslx!=null and jslx==3">
+		    t_khyljje_kssj m
+		 </if>
+	   where m.yxtid = #{id} and m.jylsly=#{sjly}
+	</delete>
+	
+	<!-- 数据定时汇总信息 -->
+	<select id="dataTimer" parameterType="String" resultType="pd">
+	    select gf_yxtid,xf_yxtid,jylsly,kqzh,jszh,ywlx,terminal_id,merchant_id,SUM(je) as zje from 
+	    t_khyljje_jsqsj where del_flag=0 and jylsly='0' and kqzh!='' GROUP BY ywlx,kqzh,gf_yxtid
+    UNION ALL
+       select gf_yxtid,xf_yxtid,jylsly,kqzh,jszh,ywlx,terminal_id,merchant_id,SUM(je) as zje from
+       t_khyljje_jsqsj where del_flag=0 and jylsly='0' and jszh!='' GROUP BY ywlx,jszh,gf_yxtid
+    UNION ALL
+       select gf_yxtid,xf_yxtid,jylsly,kqzh,jszh,ywlx,terminal_id,merchant_id,SUM(je) as zje from 
+       t_khyljje_jsqsj where del_flag=0 and jylsly='0' and terminal_id!='' GROUP BY ywlx,terminal_id,gf_yxtid
+    UNION ALL
+       select gf_yxtid,xf_yxtid,jylsly,kqzh,jszh,ywlx,terminal_id,merchant_id,SUM(je) as zje from 
+       t_khyljje_jsqsj where del_flag=0 and jylsly='0' and merchant_id!='' GROUP BY ywlx,merchant_id,gf_yxtid
+	</select>
+</mapper>

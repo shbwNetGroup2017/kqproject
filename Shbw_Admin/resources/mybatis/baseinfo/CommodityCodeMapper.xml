@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommodityCodeMapper">
+
+	<sql id="spbmColumns">
+	   id,spbm,yspbm,yspmc,creator,create_date,updator,update_date,sjly,del_flag,remark,sl
+	</sql>
+	
+	<!-- 查询商品编码list数据 -->
+	<select id="findCommodityCodelistPage" parameterType="page" resultType="pd">
+	   select 
+	      <include refid="spbmColumns"/>
+	   from t_spbmdz t where t.del_flag='0'
+		<if test="pd.spbm != null and pd.spbm != ''">
+			AND t.spbm =#{pd.spbm}
+		</if>
+		<if test="pd.yspbm != null and pd.yspbm != ''">
+			AND t.yspbm =#{pd.yspbm}
+		</if>
+		<if test="pd.yspmc!=null and pd.yspmc!=''">
+		    AND t.yspmc like concat('%',#{pd.yspmc},'%') 
+		</if>
+		order by t.create_date desc
+	</select>
+	
+	<!-- 查询原商品编码 -->
+	<select id="findCommodityCode" parameterType="pd" resultType="pd">
+	   select spbm from t_spbm where spbm=#{yspbm}
+	</select>
+	
+	<!--通过id查询数据对象  -->
+	<select id="findCommodityCodeById" parameterType="pd" resultType="pd">
+	   select 
+	      <include refid="spbmColumns"/>
+	   from t_spbmdz t where t.del_flag='0' and t.id=#{id}
+	</select>
+	
+	<!-- 批量导入EXCEL文件信息 -->
+	<insert id="insertCommodityCodeList" parameterType="pd">
+		insert into t_spbmdz(
+			spbm,
+			yspbm,
+			yspmc,
+			sl,
+			sjly,
+			creator,
+			create_date,
+			del_flag
+		) value
+		<foreach collection="list" item="map" index="index"
+			separator=","> 
+		 (
+			#{map.value0},
+			#{map.value1},
+			#{map.value2},
+			#{map.value3},
+			#{map.value4},
+			#{map.creator},
+			SYSDATE(),
+			'0'
+		)
+		</foreach>
+	</insert>
+	
+	<!-- 根据id修改数据对象 -->
+	<update id="updateCommodityCodeById" parameterType="pd">
+	    update t_spbmdz set
+	       spbm=#{spbm},
+	       yspbm=#{yspbm},
+	       yspmc=#{yspmc},
+	       sl=#{sl},
+	       sjly=#{sjly},
+	       updator=#{username},
+	       update_date=SYSDATE()
+       where id=#{id}
+	</update>
+	
+	<!-- 插入 商品编码信息 -->
+	<insert id="insertCommodityCode" parameterType="pd">
+		insert into t_spbmdz(
+			spbm,
+			yspbm,
+			yspmc,
+			sl,
+			sjly,
+			creator,
+			create_date,
+			del_flag
+		) value (
+			#{spbm},
+			#{yspbm},
+			#{yspmc},
+			#{sl},
+			#{sjly},
+			#{username},
+			SYSDATE(),
+			'0'
+		)
+	</insert>
+	
+	<update id="deleteCommodityCode" parameterType="java.lang.String">
+		update t_spbmdz t set t.del_flag=1 where id in (${value})
+	</update>
+</mapper>

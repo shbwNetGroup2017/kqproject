@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- Create By Aiwen at 2016-02-13 -->
+<mapper namespace="RedVoidMapper">
+	<select id="redVoidApplylistPage" parameterType="page" resultType="pd">
+		SELECT id,kplsh,fplx,sqlx,lcjd,zhlx,zhbh,cplb,ywlx,jslx,fpdm,fphm,fhr,hjse,hjje,jshj,xfmc,xfsh,gfmc,gfsh, kprq,kpbz FROM t_kpls t
+		<where>
+			t.del_flag=0
+		</where>
+
+		<if test="pd.xfmc != null and pd.xfmc != '' ">
+			and xfmc like concat('%',#{pd.xfmc},'%')
+		</if>
+		<if test="pd.gfmc != null and pd.gfmc != '' ">
+			and gfmc like concat('%',#{pd.gfmc},'%')
+		</if>
+		<if test="pd.fplx != null and pd.fplx != '' ">
+			and fplx = #{pd.fplx}
+		</if>
+		<if test="pd.sqlx != null and pd.sqlx != '' ">
+			and sqlx = #{pd.sqlx}
+		</if>
+		<!-- 加入时间查询条件 -->
+		<if test="pd.sqsjStart !=null and pd.sqsjStart !=''">
+			and t.create_date  <![CDATA[ >= ]]> #{pd.sqsjStart}
+		</if>
+		<if test="pd.sqsjEnd !=null and pd.sqsjEnd !=''">
+			and t.create_date  <![CDATA[ <= ]]> #{pd.sqsjEnd}
+		</if>
+		<!--  -->
+		<if test="pd.kpsqbm != null and pd.kpsqbm != '' ">
+			and fpdm like concat('%',#{pd.kpsqbm},'%')
+		</if>
+		<if test="pd.kpbz==1"> <!--申请红冲作废 -->
+			and kpbz=0 and lcjd=4
+			and (DATE_FORMAT(date_sub(SYSDATE(),INTERVAL 1 MONTH),'%Y-%m')=DATE_FORMAT(kprq,'%Y-%m') or DATE_FORMAT(SYSDATE(),'%Y-%m')=DATE_FORMAT(kprq,'%Y-%m'))
+			and t.sfhzc=0
+			or (t.lcjd=0 and kpbz in ('1','2','3'))
+		</if>
+		<if test="pd.kpbz==2"><!--审核红冲作废重打申请 -->
+			and kpbz in ('1','2','3') and lcjd=2
+		</if>
+		<if test="pd.kpbz==3"><!--开具打印红冲作废重打申请 -->
+			and kpbz in ('1','3') and lcjd=3
+		</if>
+		<if test="pd.kpbz==4"><!--申请重打 -->
+			and kpbz=0 and lcjd=4
+			and t.sfhzc=0
+		</if>
+		order by t.create_date desc
+	</select>
+	<select id="redVoidApplyById" parameterType="pd" resultType="pd">
+		select t.id,t.kplsh,t.gfmc,t.gfsh,
+		<choose>
+			<when test="kpbz==4">
+				'3' as bz
+			</when>
+			<otherwise>
+				case WHEN DATE_FORMAT(kprq, '%Y-%m') =DATE_FORMAT(SYSDATE(),'%Y-%m') then '2' else
+				'1' end bz
+			</otherwise>
+		</choose>
+		from t_kpls t where t.id=#{id}
+	</select>
+	<select id="redVoidApplyDetailById" parameterType="java.lang.String" resultType="pd">
+		select
+		t.id,t.kplsh,t.fplx,t.sqlx,t.lcjd,t.kpbz,t.zhlx,t.zhbh,t.cplb,t.ywlx,t.jslx,t.fpdm,t.fphm,t.kprq,t.ewm,t.jym,t.mwq,t.ygsid,t.hjse,t.hjje,t.jshj,t.xfid,t.xfsh,t.xfmc,t.xfyh,t.xfyhzh,t.xfdz,t.xfdh,t.gfid,t.gfsh,t.gfmc,t.gfyh,t.gfyhzh,t.gfdz,t.gfdh,t.gflxrdh,t.gflxr,t.yjdz,t.gfyb,t.zhsl,t.hsslbs,t.jmbbh,t.zyspmc,t.kpjh,t.qdbz,t.spsm,t.tspz,t.ssyf,t.tzdbh,t.yfphm,t.yfpdm,t.qmcs,t.bz,t.skr,t.kpr,t.zfr,t.fhr,t.creator,t.create_date,t.updator,t.update_date,t.del_flag,t.remark,t.sqsj,t.sklx,t.sjzclq,t.sjly,t.sfhzc,kh.sqyy,kh.fileName
+		from t_kpls t left join t_kpls_hzc kh on t.kplsh=kh.hzckplsh where t.id=#{id}
+	</select>
+	<insert id="insertKplsHzc" parameterType="pd">
+		insert into t_kpls_hzc (ysid,sqyy,fileName,yskplsh,hzckplsh,kpbz,tzdbh,creator,create_date)
+		values(#{ysid},#{sqyy},#{fileName},#{yskplsh},#{hzckplsh},#{kpbz},#{tzdbh},#{creator},#{create_date})
+	</insert>
+	<update id="updateKpls" parameterType="java.lang.String">
+		update t_kpls set sfhzc=1 where id=#{id}
+	</update>
+	<select id="updateRedVoidById" parameterType="pd">
+		update t_kpls set lcjd=#{lcjd} where id=#{id}
+	</select>
+	<select id="listKpmxs" parameterType="pd" resultType="pd">
+		select kplsh,kpmxId,jylsh,spmxxh,spmc,spbm,spje,spse,
+		dw,ggxh,dj,spsl,sl,hsbz,fphxz,creator,create_date,del_flag,
+		hsslbs,yhzcbs,bhsspje,bhsdj from t_kpmx where kplsh=#{kplsh}
+	</select>
+	<!-- /////////////////////////////////////////////////////////////////////////////// -->
+</mapper>
