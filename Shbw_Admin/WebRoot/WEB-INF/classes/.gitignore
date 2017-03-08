@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /activiti.cfg.xml
 /com
 /dbconfig.properties
@@ -8,3 +9,6 @@
 /mybatis
 /spring
 /system.properties
+=======
+/com/
+>>>>>>> branch 'master' of https://github.com/shbwNetGroup2017/kqproject.git

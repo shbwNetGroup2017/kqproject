@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%
@@ -51,9 +51,9 @@
 
 								<h4 class="smaller">Try one of the following:</h4>
 								<ul class="unstyled spaced inline bigger-110">
-									<li><i class="icon-hand-right blue"></i> 检查路径是不是有误1245989</li>
-									<li><i class="icon-hand-right blue"></i> 检查代码是不是有误</li>
-									<li><i class="icon-hand-right blue"></i> 检查环境配置是不是有误34</li>
+									<li><i class="icon-hand-right blue"></i> 检查路径是不是有误</li>
+									<li><i class="icon-hand-right blue"></i> 检查代码是不是有误123</li>
+									<li><i class="icon-hand-right blue"></i> 检查环境配置是不是有误</li>
 								</ul>
 							</div>
 
