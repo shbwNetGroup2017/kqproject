@@ -18,15 +18,26 @@
 <link rel="stylesheet" href="static/login/matrix-login.css" />
 <link href="static/login/font-awesome.css" rel="stylesheet" />
 <script type="text/javascript" src="static/js/jquery-1.5.1.min.js"></script>
-
+<style type="text/css">
+body{
+	background-color: #EEE;
+}
+.mainDiv{
+	width:100%;
+	text-align: center;
+	margin: 0 auto;
+	position: absolute;
+}
+.tittle{
+	color:#FFF;
+}
+</style>
 </head>
-<body style="background-color: #EEE;">
-
-     <div style="width:100%;text-align: center;margin: 0 auto;position: absolute;">
+<body>
+     <div class="mainDiv">
         <div id="loginbox">
-           <form action="" method="post" name="loginForm"
-				  id="loginForm">
-				 <div class="control-group normal_text">
+           <form action="" method="post" name="loginForm" id="loginForm">
+				 <div class="tittle">
 					<h3>
 						增值税管理系统
 					</h3>
@@ -179,7 +190,6 @@
 					success: function(data){
 						if("success" == data.result){
 							saveCookie();
-						//	alert('登录成功')
 							window.location.href="main/index";
 						}else if("usererror" == data.result){
 							$("#loginname").tips({

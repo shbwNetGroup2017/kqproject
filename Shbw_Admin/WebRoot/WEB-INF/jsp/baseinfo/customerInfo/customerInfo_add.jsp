@@ -283,7 +283,7 @@
 		var diagTt = new top.Dialog();
 		diagTt.Drag = true;
 		diagTt.Title = "抬头信息添加";
-		diagTt.URL = '<%=basePath%>server/customer/customerTtList.do'
+		diagTt.URL = '<%=basePath%>server/customer/customerTtList.do';
 		diagTt.Width = 1100;
 		diagTt.Height = 400;
 		diagTt.CancelEvent = function() { // 关闭事件
@@ -294,8 +294,8 @@
 				$('#ttfjName').val(diagTt.innerFrame.contentWindow.document
 						.getElementById('ttfjName').value);
 				diagTt.close();
-			};
-			diagTt.show();
+		};
+		diagTt.show();
 		}
 	</script>
 
